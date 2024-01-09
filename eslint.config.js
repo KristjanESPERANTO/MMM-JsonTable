@@ -50,6 +50,7 @@ const config = [
       "@stylistic/object-property-newline": "off",
       "@stylistic/quote-props": ["error", "as-needed"],
       "@stylistic/padded-blocks": ["error", "never"],
+      "unicorn/prefer-ternary": "off",
       "unicorn/filename-case": "off",
       "unicorn/no-null": "off",
       "unicorn/no-this-assignment": "off",

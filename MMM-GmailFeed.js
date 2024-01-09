@@ -7,14 +7,15 @@ Module.register("MMM-GmailFeed", {
 
   // Default module config.
   defaults: {
-    updateInterval: 60 * 1000,
+    updateInterval: 5 * 60 * 1000,
     maxEmails: 5,
     maxSubjectLength: 40,
     maxFromLength: 15,
     playSound: true,
     autoHide: false,
     displayMode: "table",
-    color: true
+    color: true,
+    showEmailAdressInHeader: true
   },
 
   start () {
@@ -75,7 +76,11 @@ Module.register("MMM-GmailFeed", {
         if (this.jsonData.fullcount === 0 && this.config.autoHide) {
           this.jsonData.title = "";
         }
-        result = `${this.jsonData.title}  -  ${this.jsonData.fullcount}`;
+        if (this.config.showEmailAdressInHeader) {
+          result = `${this.jsonData.title}  -  ${this.jsonData.fullcount}`;
+        } else {
+          result = `GMAIL INBOX  -  ${this.jsonData.fullcount}`;
+        }
       } else if (this.config.displayMode === "notification") {
         this.jsonData.title = "";
       }
