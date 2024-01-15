@@ -1,14 +1,31 @@
 {
   "name": "mmm-gmailfeed",
-  "description": "A module for the MagicMirror² which creates a table with unread gmail messages.",
+  "version": "2.0.0",
+  "description": "A module for the MagicMirror² which creates a table with unread Gmail messages.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaneapowell/MMM-GmailFeed"
+  },
+  "license": "MIT",
   "keywords": [
     "magic mirror",
     "smart mirror",
     "mirror email"
   ],
-  "version": "0.0.2",
   "dependencies": {
-    "request": "^2.88.2",
-    "xml2js": "^0.4.23"
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "latest",
+    "@stylistic/eslint-plugin": "latest",
+    "eslint": "^8.56.0",
+    "eslint-plugin-import": "latest",
+    "eslint-plugin-unicorn": "latest",
+    "prettier": "^3.1.1"
+  },
+  "scripts": {
+    "lint": "eslint . && prettier --check .",
+    "lint:fix": "eslint . --fix && prettier . --write",
+    "test": "npm run lint"
   }
 }

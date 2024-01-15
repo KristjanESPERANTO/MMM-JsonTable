@@ -1,51 +1,59 @@
-var NodeHelper = require("node_helper");
-var request = require("request");
-var xml2js = require("xml2js");
+const Log = require("logger");
+const NodeHelper = require("node_helper");
+const xml2js = require("xml2js");
 
 module.exports = NodeHelper.create({
-  start: function () {
-    console.log("MMM-GmailFeed helper started...");
+  start () {
+    Log.log("MMM-GmailFeed helper started...");
   },
 
-  getFeed: function (config) {
-    var self = this;
-    var feedUrl = "https://mail.google.com/mail/feed/atom";
+  async getFeed (config) {
+    try {
+      const self = this;
+      const feedUrl = "https://mail.google.com/mail/feed/atom";
 
-    request(
-      { url: feedUrl, auth: { user: config.username, pass: config.password } },
-      function (error, response, body) {
-        if (!error && response.statusCode === 200) {
-          var parser = new xml2js.Parser({ trim: true, explicitArray: false });
-          parser.parseString(body, function (err, result) {
-            if (result.feed.entry) {
-              if (!Array.isArray(result.feed.entry)) {
-                result.feed.entry = [result.feed.entry];
-              }
-
-              result.feed.entry = result.feed.entry.slice(0, config.maxEmails);
-            }
-
-            //console.log("----");
-            //console.log(JSON.stringify(result.feed, null, 2));
-            //console.log("----");
-            // Send the json data back with teh url to distinguish it on the receiving port
-            self.sendSocketNotification("MMM-GmailFeed_JSON_RESULT", {
-              username: config.username,
-              data: result.feed
-            });
-          });
-        } else {
-          self.sendSocketNotification("MMM-GmailFeed_JSON_ERROR", {
-            username: config.username,
-            error: error
-          });
+      const response = await fetch(
+        feedUrl,
+        {
+          headers: {
+            Authorization: `Basic ${btoa(`${config.username}:${config.password}`)}`
+          }
         }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error fetching feed: ${response.status}`);
       }
-    );
+
+      const parser = new xml2js.Parser({trim: true, explicitArray: false});
+      const body = await response.text();
+      parser.parseString(body, (error_, result) => {
+        if (result.feed.entry) {
+          if (!Array.isArray(result.feed.entry)) {
+            result.feed.entry = [result.feed.entry];
+          }
+
+          result.feed.entry = result.feed.entry.slice(0, config.maxEmails);
+        }
+
+        // Log.log("----");
+        // Log.log(JSON.stringify(result.feed, null, 2));
+        // Log.log("----");
+
+        // Send the json data back with the URL to distinguish it on the receiving port
+        self.sendSocketNotification("MMM-GmailFeed_JSON_RESULT", {
+          username: config.username,
+          data: result.feed
+        });
+      });
+    } catch (error) {
+      Log.error(`Error fetching feed: ${error.message}`);
+    }
   },
 
-  //Subclass socketNotificationReceived received.
-  socketNotificationReceived: function (notification, config) {
+
+  // Subclass socketNotificationReceived received.
+  socketNotificationReceived (notification, config) {
     if (notification === "MMM-GmailFeed_GET_JSON") {
       this.getFeed(config);
     }
