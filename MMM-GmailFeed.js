@@ -73,10 +73,9 @@ Module.register("MMM-GmailFeed", {
       this.mailCount = this.jsonData.fullcount;
 
       if (this.config.displayMode === "table") {
-        if (this.jsonData.fullcount === 0 && this.config.autoHide) {
+        if (this.jsonData.fullcount === "0" && this.config.autoHide) {
           this.jsonData.title = "";
-        }
-        if (this.config.showEmailAdressInHeader) {
+        } else if (this.config.showEmailAdressInHeader) {
           result = `${this.jsonData.title}  -  ${this.jsonData.fullcount}`;
         } else {
           result = `GMAIL INBOX  -  ${this.jsonData.fullcount}`;
@@ -105,7 +104,7 @@ Module.register("MMM-GmailFeed", {
       return table;
     }
 
-    if (this.jsonData.fullcount === 0 && this.config.autoHide) {
+    if (this.jsonData.fullcount === "0" && this.config.autoHide) {
       table.classList.add("hidden");
     }
 
